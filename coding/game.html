@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xingke Sun · Game Stickerbook</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #f8fafc;
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.6;
+      color: #1e293b;
+      scroll-behavior: smooth;
+      position: relative;
+      min-height: 100vh;
+    }
+    .navbar {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: center;
+      border-bottom: 1px solid #e9eef3;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+    }
+    .nav-links a {
+      text-decoration: none;
+      font-weight: 500;
+      color: #334155;
+      font-size: 1.05rem;
+      transition: color 0.2s;
+      letter-spacing: 0.01em;
+    }
+    .nav-links a:hover {
+      color: #0f172b;
+    }
+    .nav-links a.active {
+      color: #0f172b;
+      font-weight: 600;
+      border-bottom: 2px solid #0f172b;
+    }
+
+    .bg-stickers {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .bg-stickers i {
+      position: absolute;
+      color: rgba(100, 150, 200, 0.15);
+      font-size: 6rem;
+      transform: rotate(0deg);
+      animation: float 20s infinite ease-in-out;
+    }
+    .bg-stickers i:nth-child(1) { top: 5%; left: 2%; font-size: 8rem; transform: rotate(-15deg); }
+    .bg-stickers i:nth-child(2) { bottom: 15%; right: 3%; font-size: 7rem; transform: rotate(10deg); color: rgba(220, 120, 100, 0.1); }
+    .bg-stickers i:nth-child(3) { top: 20%; right: 15%; font-size: 5rem; transform: rotate(25deg); color: rgba(80, 180, 120, 0.12); }
+    .bg-stickers i:nth-child(4) { bottom: 30%; left: 10%; font-size: 9rem; transform: rotate(-5deg); color: rgba(200, 180, 60, 0.1); }
+    .bg-stickers i:nth-child(5) { top: 60%; left: 25%; font-size: 4rem; transform: rotate(45deg); color: rgba(160, 100, 200, 0.1); }
+    .bg-stickers i:nth-child(6) { top: 10%; left: 40%; font-size: 6rem; transform: rotate(80deg); color: rgba(70, 130, 200, 0.1); }
+    .bg-stickers i:nth-child(7) { bottom: 5%; right: 25%; font-size: 5.5rem; transform: rotate(-20deg); color: rgba(255, 160, 0, 0.1); }
+    .bg-stickers i:nth-child(8) { top: 45%; right: 5%; font-size: 7rem; transform: rotate(60deg); color: rgba(40, 180, 160, 0.1); }
+    .bg-stickers i:nth-child(9) { top: 70%; left: 15%; font-size: 5rem; transform: rotate(15deg); color: rgba(200, 130, 200, 0.1); }
+    .bg-stickers i:nth-child(10) { bottom: 10%; left: 30%; font-size: 6rem; transform: rotate(-30deg); color: rgba(90, 200, 200, 0.1); }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+      50% { transform: translateY(-15px) rotate(var(--rot, 0deg)); }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(4px);
+      display: inline-block;
+      padding: 1rem 3rem;
+      border-radius: 60px;
+      border: 4px dotted #ff8a5c;
+      box-shadow: 8px 8px 0 #7c5e4a;
+      width: auto;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      font-family: 'Press Start 2P', cursive;
+      color: #2d3047;
+      text-shadow: 3px 3px 0 #ffb347;
+      word-break: break-word;
+    }
+
+    .page-header p {
+      font-size: 1.1rem;
+      color: #3f5770;
+      background: #fcf3e1;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      border: 2px solid #ad8b73;
+      display: inline-block;
+      margin-top: 0.8rem;
+    }
+
+    .category-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .category-block {
+      background: #fffcf0;
+      border: 4px solid #ffb882;
+      border-radius: 40px 20px 40px 20px;
+      padding: 2rem 2.2rem;
+      box-shadow: 8px 8px 0 #a87b5a, 12px 12px 20px rgba(0,0,0,0.1);
+      transform: rotate(-0.5deg);
+      transition: transform 0.15s;
+      position: relative;
+    }
+
+    .category-block:hover {
+      transform: rotate(0deg) scale(1.01);
+    }
+
+    .category-block::before {
+      content: "📌";
+      position: absolute;
+      top: -12px;
+      left: 30px;
+      font-size: 2rem;
+      transform: rotate(-15deg);
+      filter: drop-shadow(2px 4px 2px rgba(0,0,0,0.2));
+    }
+
+    .category-title {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1f4a64;
+      border-bottom: 5px dotted #ffaa70;
+      padding-bottom: 0.3rem;
+      font-family: 'Press Start 2P', cursive;
+      text-transform: uppercase;
+      word-break: break-word;
+    }
+
+    .category-title i {
+      color: #f77f00;
+      font-size: 2.2rem;
+      filter: drop-shadow(2px 2px 0 #a8542c);
+    }
+
+    .modeling-showcase {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .modeling-showcase img {
+      max-width: 100%;
+      height: auto;
+      border: 5px solid #fca975;
+      border-radius: 30px 10px 30px 10px;
+      box-shadow: 8px 8px 0 #b0724a;
+      background: #fef7e6;
+      padding: 0.5rem;
+    }
+    .story-text {
+      background: #fef7e6;
+      border: 3px solid #fca975;
+      border-radius: 30px 10px 30px 10px;
+      padding: 1.5rem 2rem;
+      box-shadow: 5px 5px 0 #b0724a;
+      font-size: 1.1rem;
+      color: #2e405b;
+      width: 100%;
+    }
+    .story-text p {
+      margin-bottom: 0.8rem;
+    }
+    .story-text .story-title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.1rem;
+      color: #dd6b4b;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .project-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .project-mini-card {
+      background: #fef7e6;
+      border: 3px solid #fca975;
+      border-radius: 30px 10px 30px 10px;
+      padding: 1.2rem 1.2rem;
+      box-shadow: 5px 5px 0 #b0724a;
+      transition: 0.1s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .project-mini-card:hover {
+      transform: translate(3px, 3px);
+      box-shadow: 2px 2px 0 #b0724a;
+    }
+
+    .project-mini-card h4 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #2e405b;
+      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .project-mini-card h4 i {
+      color: #dd6b4b;
+      font-size: 1.2rem;
+    }
+
+    .project-mini-card p {
+      color: #3d5a73;
+      font-size: 0.92rem;
+      margin-bottom: 0.8rem;
+      flex: 1;
+    }
+
+    .project-mini-card .tech-tag {
+      display: inline-block;
+      background: #e2d5c0;
+      color: #2f4858;
+      border-radius: 30px;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 2px solid #ba9f8b;
+      box-shadow: inset -1px -1px 0 #866653;
+      margin-right: 0.3rem;
+      margin-bottom: 0.2rem;
+      text-transform: uppercase;
+    }
+
+    .back-home {
+      display: inline-block;
+      margin-top: 3rem;
+      color: #1e4158;
+      text-decoration: none;
+      font-weight: bold;
+      background: #ffdbb5;
+      border: 3px solid #9b7b62;
+      padding: 0.7rem 2rem;
+      border-radius: 40px;
+      box-shadow: 5px 5px 0 #6d5c4b;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.9rem;
+      transition: 0.1s;
+    }
+
+    .back-home:hover {
+      transform: translate(3px, 3px);
+      box-shadow: 2px 2px 0 #6d5c4b;
+      background: #ffeac5;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 2rem 0 1rem;
+      color: #6a6a6a;
+      border-top: 4px dotted #c0a080;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      font-family: 'Press Start 2P', cursive;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    @media (max-width: 600px) {
+      .page-header h1 { font-size: 1.5rem; }
+      .category-title { font-size: 1.5rem; }
+      .nav-links { gap: 1rem; }
+      .nav-links a { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-stickers">
+    <i class="fas fa-gamepad"></i>
+    <i class="fas fa-keyboard"></i>
+    <i class="fas fa-computer"></i>
+    <i class="fas fa-headphones"></i>
+    <i class="fas fa-dice-d6"></i>
+    <i class="fas fa-joystick"></i>
+    <i class="fas fa-puzzle-piece"></i>
+    <i class="fas fa-crown"></i>
+    <i class="fas fa-shield-halved"></i>
+    <i class="fas fa-wand-sparkles"></i>
+  </div>
+
+  <nav class="navbar">
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="game.html" class="active">Game</a>
+      <a href="#">Coding</a>
+      <a href="#">Go</a>
+      <a href="#">Daily</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>GAME STICKERBOOK</h1>
+    </div>
+
+    <div class="category-grid">
+      <!-- Modeling -->
+      <section class="category-block">
+        <div class="category-title">
+          <i class="fas fa-cubes"></i>
+          <h2>Modeling</h2>
+        </div>
+        <div class="modeling-showcase">
+          <img src="../picture/camer.jpg" alt="3D rendering" loading="lazy">
+          <div class="story-text">
+            <div class="story-title">Camer</div>
+            <p>My initial idea for Camer came from watching videos on short-video platforms. Many people film as if the camera is attached to their heads, recording various vlogs from a first-person perspective—it's quite ironic. However, during the creative process, I realized something deeper: in this era of advanced technology, cameras make every move people make feel like it's under a magnifying glass, with nowhere to hide.</p>
+            <p>This design philosophy ultimately gave birth to Camer. When people raise their cameras to record trivial moments to compare with others, it's as if everyone is completely exposed, with no privacy left.</p>
+          </div>
+        </div>
+      </section>
+
+            <!-- Twine Game -->
+      <section class="category-block">
+        <div class="category-title">
+          <i class="fas fa-scroll"></i>
+          <h2>Twine Game</h2>
+        </div>
+        <div class="project-mini-grid" style="grid-template-columns: repeat(2, 1fr);">
+          <!-- Escape -->
+          <div class="project-mini-card">
+            <h4><i class="fas fa-door-open"></i> Escape</h4>
+            <p><strong>Background:</strong> You are trapped in a room... a mysterious chest, terrifying monsters, or... a nap?</p>
+            <a href="../code/escape.html" target="_blank" class="tech-tag" style="display: inline-block; margin-top: 8px;">▶ Play Game</a>
+          </div>
+          <!-- Jack and the Beanstalk -->
+          <div class="project-mini-card">
+            <h4><i class="fas fa-seedling"></i> Jack and the Beanstalk</h4>
+            <p><strong>Background:</strong> As a twist on a classic tale, you play as Jack making a series of different choices. Will you live a plain life, fight the demon king, or...? This time, the story is yours to write!</p>
+            <a href="../code/Jack%20and%20Beanstalk.html" target="_blank" class="tech-tag" style="display: inline-block; margin-top: 8px;">▶ Play Game</a>
+          </div>
+        </div>
+      </section>
+
+            <!-- @social -->
+      <section class="category-block">
+        <div class="category-title">
+          <i class="fas fa-hashtag"></i>
+          <h2>@social</h2>
+        </div>
+        <div class="project-mini-grid" style="grid-template-columns: 1fr;"> <!-- 单列卡片占满 -->
+          <div class="project-mini-card">
+            <h4><i class="fas fa-robot"></i> @social — Be the Algorithm</h4>
+            <p><strong>Concept & Message:</strong> This inquiry resulted in @social, a text-based game where players embody a social media algorithm. Here, I transformed cold algorithmic logic into tangible moral choices, learning firsthand that game rules are silent narrators and carriers of values.</p>
+            <p><strong>Core Message:</strong> Social media is bad for you and for society.</p>
+            <p><strong>Themes:</strong> Effects of social media; individual vs society; morality and survival; conformism and identity; information, misinformation, and censorship; mental health; dark humor.</p>
+            <p><strong>Engagement & Emotions:</strong> Driven by a compelling story and meaningful decision-making, the game aims to tug players' emotions in many directions—from the fake happiness social media can give to deep sadness—creating an emotional experience that mirrors the platform itself.</p>
+            <a href="https://curric357-final.vercel.app/" target="_blank" class="tech-tag" style="display: inline-block; margin-top: 12px;">▶ Play @social (Vercel)</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gaming -->
+      <section class="category-block">
+        <div class="category-title">
+          <i class="fas fa-gamepad"></i>
+          <h2>Gaming</h2>
+        </div>
+        <p style="font-size: 1.2rem; margin-bottom: 1.5rem; font-style: italic; color: #dd6b4b;">🎮 Wanna relax?</p>
+        
+        <div class="project-mini-grid" style="grid-template-columns: repeat(3, 1fr);"> <!-- 强制三列等宽 -->
+          <!-- 2048 -->
+          <div class="project-mini-card">
+            <h4><i class="fas fa-chess-board"></i> 2048</h4>
+            <p>Merge tiles to reach 2048. Simple yet addictive.</p>
+            <a href="2048.html" target="_blank" class="tech-tag" style="display: inline-block; margin-top: 8px;">▶ Play</a>
+          </div>
+          <!-- Minesweeper -->
+          <div class="project-mini-card">
+            <h4><i class="fas fa-bomb"></i> Minesweeper</h4>
+            <p>Classic 9x9 with 10 mines. Can you clear the field?</p>
+            <a href="minesweeper.html" target="_blank" class="tech-tag" style="display: inline-block; margin-top: 8px;">▶ Play</a>
+          </div>
+          <!-- sudoku -->
+          <div class="project-mini-card">
+            <h4><i class="fas fa-table-cells"></i> Sudoku</h4>
+            <p>9x9 classic puzzle. Fill the grid with logic.</p>
+            <a href="sudoku.html" target="_blank" class="tech-tag" style="display: inline-block; margin-top: 8px;">▶ Play</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Others -->
+      <section class="category-block">
+        <div class="category-title">
+          <i class="fas fa-flask"></i>
+          <h2>Others</h2>
+        </div>
+        <div class="project-mini-grid">
+          <!-- Unity  -->
+          <div class="project-mini-card" style="grid-column: 1 / -1;">
+            <h4><i class="fas fa-play-circle"></i> Unity Mechanics Demo</h4>
+            <video src="../picture/unity.mov" controls style="width:100%; height:auto; border-radius: 20px; margin-bottom: 10px;">
+              Your browser does not support the video tag.
+            </video>
+            <p>Unity project featuring dash, attack, and move mechanics implemented in C#. This demo showcases core gameplay systems built from scratch.</p>
+          </div>
+          <!-- COC TRPG -->
+          <div class="project-mini-card" style="grid-column: 1 / -1;">
+            <h4><i class="fas fa-dice-d20"></i> Call of Cthulhu TRPG Scenario</h4>
+            <p>A Chinese-language Call of Cthulhu scenario titled <strong>ECO</strong>, designed for cooperative investigator play. As the Keeper, I guide players through an open-ended narrative where their choices lead to multiple possible endings. This scenario reflects my approach to game design: creating immersive, player-driven stories with branching paths and cosmic horror elements.</p>
+            <a href="../code/eco.docx" target="_blank" class="tech-tag" style="display: inline-block; margin-top: 8px;">📄 Download Scenario (DOCX)</a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div style="text-align: center;">
+      <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> back to main</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>🎮  stickers, games & pixels  🎮</p>
+    <p style="font-size:0.7rem; margin-top:0.5rem;">Xingke Sun · Game Stickerbook</p>
+  </footer>
+</body>
+</html>

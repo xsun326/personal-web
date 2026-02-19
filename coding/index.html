@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xingke Sun · portfolio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #f8fafc;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: #1e293b;
+      scroll-behavior: smooth;
+    }
+    .navbar {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: center;
+      border-bottom: 1px solid #e9eef3;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+    }
+    .nav-links a {
+      text-decoration: none;
+      font-weight: 500;
+      color: #334155;
+      font-size: 1.05rem;
+      transition: color 0.2s;
+      letter-spacing: 0.01em;
+    }
+    .nav-links a:hover {
+      color: #0f172b;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1.8rem;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 32px;
+      padding: 2.5rem 2.8rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.02), 0 4px 10px rgba(0,0,0,0.01);
+      border: 1px solid #f0f4f9;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      box-shadow: 0 20px 35px rgba(0,0,0,0.03);
+    }
+    .hero {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .avatar {
+      flex-shrink: 0;
+      width: 130px;
+      height: 130px;
+      background: linear-gradient(145deg, #d9e2ef, #cbd5e1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #334155;
+      font-size: 4rem;
+      box-shadow: 0 10px 20px -8px rgba(0,20,30,0.15);
+      border: 4px solid white;
+    }
+    .hero-text h1 {
+      font-size: 2.8rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #0b1e2e;
+      line-height: 1.2;
+      margin-bottom: 0.3rem;
+    }
+    .hero-text .tagline {
+      font-size: 1.3rem;
+      font-weight: 350;
+      color: #475569;
+      margin-bottom: 0.6rem;
+    }
+    .hero-text .bio {
+      max-width: 650px;
+      color: #3a4a5c;
+      font-size: 1.1rem;
+    }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.8rem;
+      font-size: 1.8rem;
+      font-weight: 500;
+      color: #1e2f40;
+    }
+    .section-title i {
+      color: #5f7d9c;
+      font-size: 1.8rem;
+    }
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.8rem;
+      margin-top: 0.5rem;
+    }
+    .project-item {
+      background: #f9fcff;
+      border-radius: 24px;
+      padding: 1.8rem 1.5rem;
+      border: 1px solid #e2edf5;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .project-item:hover {
+      background: #ffffff;
+      border-color: #bcd3e6;
+      transform: translateY(-4px);
+    }
+    .project-item i {
+      font-size: 2.5rem;
+      color: #3f6b9c;
+      margin-bottom: 1rem;
+    }
+    .project-item h3 {
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #1f3449;
+    }
+    .project-item p {
+      color: #4f6479;
+      font-size: 0.95rem;
+      margin-bottom: 1.3rem;
+    }
+    .project-link {
+      display: inline-block;
+      background: #e1ebf7;
+      color: #1e405e;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      border: 1px solid #b9d1e9;
+      transition: background 0.15s;
+    }
+    .project-link:hover {
+      background: #cddef5;
+      border-color: #8fb4da;
+    }
+    .contact-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2.2rem;
+      align-items: center;
+      margin-top: 1rem;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+      color: #2b4056;
+      font-weight: 470;
+      background: #f2f8ff;
+      padding: 0.6rem 1.4rem;
+      border-radius: 40px;
+      border: 1px solid #d7e6f3;
+      transition: background 0.15s;
+    }
+    .contact-item i {
+      font-size: 1.3rem;
+      color: #31668c;
+    }
+    .contact-item:hover {
+      background: #e5f0fd;
+      border-color: #9fbddb;
+    }
+    .footer {
+      text-align: center;
+      color: #6b7d91;
+      padding: 2rem 0 1rem;
+      font-size: 0.95rem;
+      border-top: 1px solid #e6edf5;
+      margin-top: 1rem;
+    }
+    .footer a {
+      color: #2e577c;
+      text-decoration: none;
+      border-bottom: 1px dotted #aac3db;
+    }
+    @media (max-width: 600px) {
+      .navbar { padding: 0.8rem; }
+      .nav-links { gap: 1.2rem; }
+      .hero { justify-content: center; text-align: center; }
+      .hero-text h1 { font-size: 2.2rem; }
+      .card { padding: 1.8rem 1.5rem; }
+      .contact-links { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="game.html" class="active">Game</a>
+      <a href="#">Coding</a>   <!-- 后续可替换为 coding.html -->
+      <a href="#">Go</a>       <!-- 后续可替换为 go.html -->
+      <a href="#">Daily</a>    <!-- 后续可替换为 daily.html -->
+      <a href="index.html#contact">Contact</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <!-- HOME / HERO -->
+    <section id="home" class="card" style="scroll-margin-top: 70px;">
+      <div class="hero">
+        <div class="avatar">
+          <img src="../picture/avatar.jpg" alt="Xingke Sun, smiling, wearing glasses, neutral background, calm and welcoming mood" style="width:100%; height:100%; object-fit: cover; border-radius: 50%;">
+        </div>
+        <div class="hero-text">
+          <h1>Xingke Sun</h1>
+          <div class="tagline">Go player · Game developer · Code programmer</div>
+          <p class="bio">
+            Graduated from University of Wisconsin–Madison with a double major in Mathematics and Computer Science, and a certificate in Game Design.<br>
+            I enjoy building things, playing Go, and exploring the intersection of code and creativity.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOUR FIELDS SECTION (Coding, Game, Go, Daily) -->
+    <section id="fields" class="card" style="scroll-margin-top: 70px;">
+      <div class="section-title">
+        <i class="fas fa-th-large"></i>
+        <h2>Explore my work</h2>
+      </div>
+      <div class="project-grid">
+        <!-- Coding -->
+        <div id="coding" class="project-item" style="scroll-margin-top: 70px;">
+          <i class="fas fa-code"></i>
+          <h3>Coding</h3>
+          <p>Algorithms, full‑stack projects, and open‑source contributions.</p>
+          <a href="#" class="project-link" target="_blank">View projects →</a>
+        </div>
+        <!-- Game -->
+        <div id="game" class="project-item" style="scroll-margin-top: 70px;">
+          <i class="fas fa-gamepad"></i>
+          <h3>Game</h3>
+          <p>Prototypes, game jams, and design experiments.</p>
+          <a href="game.html" class="project-link">See games →</a>
+        </div>
+        <!-- Go -->
+        <div id="go" class="project-item" style="scroll-margin-top: 70px;">
+          <i class="fas fa-circle"></i>  <!--围棋可用圆形抽象表示，或使用围棋专用图标，但fas无专用，保持简洁 -->
+          <h3>Go</h3>
+          <p>Match records, study notes, and the beauty of the game.</p>
+          <a href="#" class="project-link" target="_blank">Go study →</a>
+        </div>
+        <!-- Daily -->
+        <div id="daily" class="project-item" style="scroll-margin-top: 70px;">
+          <i class="fas fa-sun"></i>
+          <h3>Daily</h3>
+          <p>Blog, photography, and random thoughts.</p>
+          <a href="#" class="project-link" target="_blank">Read diary →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT (unchanged except email) -->
+    <section id="contact" class="card" style="scroll-margin-top: 70px;">
+      <div class="section-title">
+        <i class="fas fa-paper-plane"></i>
+        <h2>Contact</h2>
+      </div>
+      <p style="margin-bottom: 1.8rem;">Feel free to reach out through any of these channels.</p>
+
+      <div class="contact-links">
+        <a href="mailto:trelasxk@gmail.com" class="contact-item">
+          <i class="far fa-envelope"></i> trelasxk@gmail.com
+        </a>
+        <a href="https://github.com/xsun326" class="contact-item" target="_blank">
+          <i class="fab fa-github"></i> github/xsun326
+        </a>
+      </div>
+
+      <div style="margin-top: 2rem; background: #F1F7FD; border-radius: 30px; padding: 1.3rem 1.8rem;">
+        <i class="fas fa-rss" style="color: #f29e4c; margin-right: 10px;"></i>
+        <span style="font-weight: 460;">Now:</span> Building a Go study tool and preparing for the next game jam.
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>✨ Hand‑crafted with HTML/CSS · Free to remix ✨</p>
+      <p style="margin-top: 0.5rem;">♾️ Hosted anywhere · No tracking · No ads</p>
+      <p style="font-size:0.88rem; margin-top: 0.8rem;"><i class="far fa-smile-wink"></i> Thanks for stopping by.</p>
+    </footer>
+  </main>
+</body>
+</html>

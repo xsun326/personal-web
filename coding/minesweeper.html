@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minesweeper · 9x9</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f7f2e9;
+            color: #1e293b;
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .bg-stickers {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .bg-stickers i {
+            position: absolute;
+            color: rgba(100, 150, 200, 0.15);
+            font-size: 6rem;
+            transform: rotate(0deg);
+            animation: float 20s infinite ease-in-out;
+        }
+        .bg-stickers i:nth-child(1) { top: 5%; left: 2%; font-size: 8rem; transform: rotate(-15deg); }
+        .bg-stickers i:nth-child(2) { bottom: 15%; right: 3%; font-size: 7rem; transform: rotate(10deg); color: rgba(220, 120, 100, 0.1); }
+        .bg-stickers i:nth-child(3) { top: 20%; right: 15%; font-size: 5rem; transform: rotate(25deg); color: rgba(80, 180, 120, 0.12); }
+        .bg-stickers i:nth-child(4) { bottom: 30%; left: 10%; font-size: 9rem; transform: rotate(-5deg); color: rgba(200, 180, 60, 0.1); }
+        .bg-stickers i:nth-child(5) { top: 60%; left: 25%; font-size: 4rem; transform: rotate(45deg); color: rgba(160, 100, 200, 0.1); }
+        .bg-stickers i:nth-child(6) { top: 10%; left: 40%; font-size: 6rem; transform: rotate(80deg); color: rgba(70, 130, 200, 0.1); }
+        .bg-stickers i:nth-child(7) { bottom: 5%; right: 25%; font-size: 5.5rem; transform: rotate(-20deg); color: rgba(255, 160, 0, 0.1); }
+        .bg-stickers i:nth-child(8) { top: 45%; right: 5%; font-size: 7rem; transform: rotate(60deg); color: rgba(40, 180, 160, 0.1); }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+            50% { transform: translateY(-15px) rotate(var(--rot, 0deg)); }
+        }
+
+        /* 主卡片 */
+        .game-card {
+            background: #fffcf0;
+            border: 4px solid #ffb882;
+            border-radius: 40px 20px 40px 20px;
+            padding: 2rem 2rem;
+            box-shadow: 8px 8px 0 #a87b5a, 12px 12px 20px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+            max-width: 550px;
+            width: 100%;
+            transform: rotate(-0.5deg);
+        }
+        .game-card:hover {
+            transform: rotate(0deg);
+        }
+        .game-card::before {
+            content: "📌";
+            position: absolute;
+            top: -12px;
+            left: 30px;
+            font-size: 2rem;
+            transform: rotate(-15deg);
+            filter: drop-shadow(2px 4px 2px rgba(0,0,0,0.2));
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.8rem;
+            color: #1f4a64;
+            text-align: center;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 0 #ffaa70;
+            word-break: break-word;
+        }
+
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fef7e6;
+            border: 3px solid #fca975;
+            border-radius: 30px 10px 30px 10px;
+            padding: 0.8rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 5px 5px 0 #b0724a;
+        }
+        .mine-count, .status {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2e405b;
+        }
+        .mine-count i, .status i {
+            color: #dd6b4b;
+            margin-right: 0.5rem;
+        }
+        #reset {
+            background: #e2d5c0;
+            border: 2px solid #ba9f8b;
+            color: #2f4858;
+            font-size: 1.2rem;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 #866653;
+            transition: 0.1s;
+        }
+        #reset:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 #866653;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 4px;
+            background: #bbada0;
+            padding: 6px;
+            border-radius: 20px;
+            border: 4px solid #fca975;
+            box-shadow: 5px 5px 0 #b0724a;
+            margin-bottom: 1.5rem;
+        }
+        .cell {
+            aspect-ratio: 1 / 1;
+            background: #fef7e6;
+            border: 2px solid #fca975;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #1f4a64;
+            cursor: pointer;
+            box-shadow: inset -2px -2px 0 #b0724a;
+            transition: 0.05s;
+            user-select: none;
+        }
+        .cell.revealed {
+            background: #e2d5c0;
+            border-color: #ba9f8b;
+            box-shadow: inset 0 0 0 1px #866653;
+            color: #2d3047;
+        }
+        .cell.flagged::before {
+            content: "🚩";
+            font-size: 1.2rem;
+        }
+        .cell.mine.revealed {
+            background: #dd6b4b;
+            color: white;
+        }
+        .cell.mine.revealed::before {
+            content: "💣";
+            font-size: 1.2rem;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #1e4158;
+            text-decoration: none;
+            font-weight: bold;
+            background: #ffdbb5;
+            border: 3px solid #9b7b62;
+            padding: 0.7rem 1rem;
+            border-radius: 40px;
+            box-shadow: 5px 5px 0 #6d5c4b;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            transition: 0.1s;
+        }
+        .back-link:hover {
+            transform: translate(3px, 3px);
+            box-shadow: 2px 2px 0 #6d5c4b;
+            background: #ffeac5;
+        }
+
+        @media (max-width: 500px) {
+            .game-card { padding: 1.5rem; }
+            h1 { font-size: 1.2rem; }
+            .cell { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-stickers">
+        <i class="fas fa-gamepad"></i>
+        <i class="fas fa-keyboard"></i>
+        <i class="fas fa-computer"></i>
+        <i class="fas fa-headphones"></i>
+        <i class="fas fa-dice-d6"></i>
+        <i class="fas fa-joystick"></i>
+        <i class="fas fa-puzzle-piece"></i>
+        <i class="fas fa-crown"></i>
+    </div>
+
+    <div class="game-card">
+        <h1>MINESWEEPER</h1>
+        <div class="info-panel">
+            <div class="mine-count"><i class="fas fa-bomb"></i> <span id="mine-counter">10</span></div>
+            <div class="status"><span id="game-status">😊</span></div>
+            <button id="reset"><i class="fas fa-redo-alt"></i> New</button>
+        </div>
+
+        <div class="grid" id="grid"></div>
+
+        <a href="game.html" class="back-link"><i class="fas fa-arrow-left"></i> back to Game Stickerbook</a>
+    </div>
+
+    <script>
+        const GRID_SIZE = 9;
+        const TOTAL_MINES = 10;
+
+        let board = []; 
+        let gameOver = false;
+        let gameWon = false;
+        let minesLeft = TOTAL_MINES;
+
+        const gridEl = document.getElementById('grid');
+        const mineCounterEl = document.getElementById('mine-counter');
+        const gameStatusEl = document.getElementById('game-status');
+        const resetBtn = document.getElementById('reset');
+
+        function initBoard(firstClickRow = -1, firstClickCol = -1) {
+            board = [];
+            for (let i = 0; i < GRID_SIZE; i++) {
+                let row = [];
+                for (let j = 0; j < GRID_SIZE; j++) {
+                    row.push({ mine: false, revealed: false, flagged: false, count: 0 });
+                }
+                board.push(row);
+            }
+
+            let minesPlaced = 0;
+            if (firstClickRow !== -1 && firstClickCol !== -1) {
+                while (minesPlaced < TOTAL_MINES) {
+                    let r = Math.floor(Math.random() * GRID_SIZE);
+                    let c = Math.floor(Math.random() * GRID_SIZE);
+                    if (!board[r][c].mine && !(r === firstClickRow && c === firstClickCol)) {
+                        board[r][c].mine = true;
+                        minesPlaced++;
+                    }
+                }
+            } else {
+                while (minesPlaced < TOTAL_MINES) {
+                    let r = Math.floor(Math.random() * GRID_SIZE);
+                    let c = Math.floor(Math.random() * GRID_SIZE);
+                    if (!board[r][c].mine) {
+                        board[r][c].mine = true;
+                        minesPlaced++;
+                    }
+                }
+            }
+
+            for (let i = 0; i < GRID_SIZE; i++) {
+                for (let j = 0; j < GRID_SIZE; j++) {
+                    if (board[i][j].mine) continue;
+                    let count = 0;
+                    for (let di = -1; di <= 1; di++) {
+                        for (let dj = -1; dj <= 1; dj++) {
+                            if (di === 0 && dj === 0) continue;
+                            let ni = i + di, nj = j + dj;
+                            if (ni >= 0 && ni < GRID_SIZE && nj >= 0 && nj < GRID_SIZE && board[ni][nj].mine) count++;
+                        }
+                    }
+                    board[i][j].count = count;
+                }
+            }
+
+            minesLeft = TOTAL_MINES;
+            gameOver = false;
+            gameWon = false;
+            updateMineCounter();
+            gameStatusEl.textContent = '😊';
+        }
+
+        function render() {
+            gridEl.innerHTML = '';
+            for (let i = 0; i < GRID_SIZE; i++) {
+                for (let j = 0; j < GRID_SIZE; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    if (board[i][j].revealed) {
+                        cell.classList.add('revealed');
+                        if (board[i][j].mine) {
+                            cell.classList.add('mine');
+                            cell.textContent = '';
+                        } else {
+                            cell.textContent = board[i][j].count > 0 ? board[i][j].count : '';
+                        }
+                    } else {
+                        if (board[i][j].flagged) {
+                            cell.classList.add('flagged');
+                        }
+                    }
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    gridEl.appendChild(cell);
+                }
+            }
+        }
+
+        function expand(row, col) {
+            if (row < 0 || row >= GRID_SIZE || col < 0 || col >= GRID_SIZE) return;
+            if (board[row][col].revealed || board[row][col].flagged) return;
+            if (board[row][col].mine) return;
+
+            board[row][col].revealed = true;
+
+            if (board[row][col].count === 0) {
+                for (let di = -1; di <= 1; di++) {
+                    for (let dj = -1; dj <= 1; dj++) {
+                        if (di === 0 && dj === 0) continue;
+                        expand(row + di, col + dj);
+                    }
+                }
+            }
+        }
+
+        function leftClick(row, col) {
+            if (gameOver || gameWon) return;
+            if (board[row][col].revealed || board[row][col].flagged) return;
+
+            let anyRevealed = board.some(r => r.some(c => c.revealed));
+            if (!anyRevealed && board[row][col].mine) {
+                initBoard(row, col);
+                render();
+                return;
+            }
+
+            if (board[row][col].mine) {
+                gameOver = true;
+                gameStatusEl.textContent = '💥';
+                for (let i = 0; i < GRID_SIZE; i++) {
+                    for (let j = 0; j < GRID_SIZE; j++) {
+                        if (board[i][j].mine) board[i][j].revealed = true;
+                    }
+                }
+                render();
+                return;
+            }
+
+            expand(row, col);
+            checkWin();
+            render();
+        }
+
+        function rightClick(event, row, col) {
+            event.preventDefault();
+            if (gameOver || gameWon) return;
+            if (board[row][col].revealed) return;
+
+            if (!board[row][col].flagged) {
+                if (minesLeft > 0) {
+                    board[row][col].flagged = true;
+                    minesLeft--;
+                }
+            } else {
+                board[row][col].flagged = false;
+                minesLeft++;
+            }
+            updateMineCounter();
+            checkWin();
+            render();
+        }
+
+        function checkWin() {
+            let allSafeRevealed = true;
+            for (let i = 0; i < GRID_SIZE; i++) {
+                for (let j = 0; j < GRID_SIZE; j++) {
+                    if (!board[i][j].mine && !board[i][j].revealed) {
+                        allSafeRevealed = false;
+                        break;
+                    }
+                }
+            }
+            if (allSafeRevealed) {
+                gameWon = true;
+                gameStatusEl.textContent = '🎉';
+            }
+        }
+
+        function updateMineCounter() {
+            mineCounterEl.textContent = minesLeft;
+        }
+
+        function resetGame() {
+            initBoard();
+            render();
+        }
+
+        gridEl.addEventListener('click', (e) => {
+            const cell = e.target.closest('.cell');
+            if (!cell) return;
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
+            leftClick(row, col);
+        });
+
+        gridEl.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            const cell = e.target.closest('.cell');
+            if (!cell) return;
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
+            rightClick(e, row, col);
+        });
+
+        resetBtn.addEventListener('click', resetGame);
+
+        initBoard();
+        render();
+    </script>
+</body>
+</html>
